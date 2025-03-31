@@ -52,6 +52,34 @@ async fn index(
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
+#[get("/users")]
+async fn users_page(
+    tmpl: web::Data<Tera>,
+    repo: web::Data<Arc<dyn Repository>>,
+) -> impl Responder {
+    let mut ctx = tera::Context::new();
+    
+    match repo.get_users() {
+        Ok(users) => {
+            ctx.insert("users", &users);
+        },
+        Err(e) => {
+            eprintln!("Ошибка при получении пользователей: {}", e);
+            ctx.insert("users", &Vec::<User>::new());
+        }
+    }
+    
+    let rendered = match tmpl.render("users.html", &ctx) {
+        Ok(t) => t,
+        Err(e) => {
+            eprintln!("Ошибка рендеринга шаблона: {}", e);
+            return HttpResponse::InternalServerError().body("Ошибка рендеринга шаблона");
+        }
+    };
+    
+    HttpResponse::Ok().content_type("text/html").body(rendered)
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     // Загружаем переменные среды из .env файла, если он существует
@@ -111,32 +139,4 @@ async fn main() -> std::io::Result<()> {
     .bind(("0.0.0.0", port))?
     .run()
     .await
-}Ошибка рендеринга шаблона");
-        }
-    };
-    
-    HttpResponse::Ok().content_type("text/html").body(rendered)
 }
-
-#[get("/users")]
-async fn users_page(
-    tmpl: web::Data<Tera>,
-    repo: web::Data<Arc<dyn Repository>>,
-) -> impl Responder {
-    let mut ctx = tera::Context::new();
-    
-    match repo.get_users() {
-        Ok(users) => {
-            ctx.insert("users", &users);
-        },
-        Err(e) => {
-            eprintln!("Ошибка при получении пользователей: {}", e);
-            ctx.insert("users", &Vec::<User>::new());
-        }
-    }
-    
-    let rendered = match tmpl.render("users.html", &ctx) {
-        Ok(t) => t,
-        Err(e) => {
-            eprintln!("Ошибка рендеринга шаблона: {}", e);
-            return HttpResponse::InternalServerError().body("
