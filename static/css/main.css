@@ -1,0 +1,95 @@
+/* Основные стили */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Стили для тегов */
+.tag-badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+    background-color: #6c757d;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+.tag-remove {
+    margin-left: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Стили для приоритетов */
+.priority-low {
+    background-color: #28a745;
+}
+
+.priority-medium {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.priority-high {
+    background-color: #fd7e14;
+}
+
+.priority-critical {
+    background-color: #dc3545;
+}
+
+/* Стили для статусов */
+.status-new {
+    background-color: #17a2b8;
+}
+
+.status-in-progress {
+    background-color: #007bff;
+}
+
+.status-completed {
+    background-color: #28a745;
+}
+
+.status-cancelled {
+    background-color: #6c757d;
+}
+
+/* Стили для просроченных задач */
+.overdue {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Стили для действий в таблице */
+.action-btn {
+    margin-right: 5px;
+}
+
+/* Стили для контейнера тегов */
+#tagsContainer {
+    min-height: 30px;
+    padding: 5px 0;
+}
+
+/* Анимации для оповещений */
+.alert-appear {
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
