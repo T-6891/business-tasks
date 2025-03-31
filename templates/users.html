@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Пользователи системы{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Пользователи системы</h1>
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal">
+            <i class="bi bi-plus-circle"></i> Новый пользователь
+        </button>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Фильтры</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="filterRole" class="form-label">Роль</label>
+                <select id="filterRole" class="form-select">
+                    <option value="">Все</option>
+                    <option value="executor">Исполнители</option>
+                    <option value="customer">Заказчики</option>
+                </select>
+            </div>
+            <div class="col-md-8">
+                <label for="filterSearch" class="form-label">Поиск</label>
+                <input type="text" id="filterSearch" class="form-control" placeholder="Поиск по имени или email...">
+            </div>
+            <div class="col-12 text-end">
+                <button id="applyFilters" class="btn btn-primary">Применить фильтры</button>
+                <button id="resetFilters" class="btn btn-outline-secondary">Сбросить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Имя</th>
+                <th>Email</th>
+                <th>Роль</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody id="usersTableBody">
+            {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.role == "Executor" %}
+                    <span class="badge bg-primary">Исполнитель</span>
+                    {% else %}
+                    <span class="badge bg-success">Заказчик</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-outline-primary action-btn edit-user-btn" data-id="{{ user.id }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger action-btn delete-user-btn" data-id="{{ user.id }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center py-3">Нет доступных пользователей</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Модальное окно для создания/редактирования пользователя -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalLabel">Новый пользователь</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Имя</label>
+                        <input type="text" class="form-control" id="userName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="userEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userRole" class="form-label">Роль</label>
+                        <select class="form-select" id="userRole" required>
+                            <option value="executor">Исполнитель</option>
+                            <option value="customer">Заказчик</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="saveUserBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для подтверждения удаления -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить этого пользователя?</p>
+                <p class="text-danger">Внимание: Удаление пользователя приведет к удалению всех связанных с ним поручений!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // JavaScript для страницы пользователей, аналогичный app.js
+    document.addEventListener('DOMContentLoaded', () => {
+        // Обработчики для кнопок добавления/редактирования/удаления пользователей
+        // Код реализации будет похожим на логику для задач
+        
+        // Для простоты, при клике на кнопки будем показывать уведомление,
+        // что функциональность будет реализована в будущих версиях
+        document.querySelectorAll('.edit-user-btn, .delete-user-btn, #saveUserBtn, #confirmDeleteBtn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                alert('Эта функциональность будет доступна в следующей версии приложения');
+            });
+        });
+    });
+</script>
+{% endblock %}
