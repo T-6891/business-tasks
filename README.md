@@ -25,7 +25,7 @@
 
 1. Клонируйте репозиторий:
 ```bash
-git clone https://github.com/yourusername/business-tasks.git
+git clone https://github.com/T-6219/business-tasks.git
 cd business-tasks
 ```
 
