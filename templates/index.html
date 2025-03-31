@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Управление поручениями{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Управление поручениями</h1>
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#taskModal">
+            <i class="bi bi-plus-circle"></i> Новое поручение
+        </button>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0">Фильтры</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="filterStatus" class="form-label">Статус</label>
+                <select id="filterStatus" class="form-select">
+                    <option value="">Все</option>
+                    <option value="new">Новые</option>
+                    <option value="in_progress">В работе</option>
+                    <option value="completed">Завершенные</option>
+                    <option value="cancelled">Отмененные</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterPriority" class="form-label">Приоритет</label>
+                <select id="filterPriority" class="form-select">
+                    <option value="">Все</option>
+                    <option value="low">Низкий</option>
+                    <option value="medium">Средний</option>
+                    <option value="high">Высокий</option>
+                    <option value="critical">Критический</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterCustomer" class="form-label">Заказчик</label>
+                <select id="filterCustomer" class="form-select">
+                    <option value="">Все</option>
+                    {% for user in customers %}
+                    <option value="{{ user.id }}">{{ user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterExecutor" class="form-label">Исполнитель</label>
+                <select id="filterExecutor" class="form-select">
+                    <option value="">Все</option>
+                    {% for user in executors %}
+                    <option value="{{ user.id }}">{{ user.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="filterTags" class="form-label">Теги</label>
+                <input type="text" id="filterTags" class="form-control" placeholder="Введите теги через запятую">
+            </div>
+            <div class="col-md-6">
+                <label for="filterSearch" class="form-label">Поиск</label>
+                <input type="text" id="filterSearch" class="form-control" placeholder="Поиск по названию или описанию...">
+            </div>
+            <div class="col-12 text-end">
+                <button id="applyFilters" class="btn btn-primary">Применить фильтры</button>
+                <button id="resetFilters" class="btn btn-outline-secondary">Сбросить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Название</th>
+                <th>Статус</th>
+                <th>Приоритет</th>
+                <th>Заказчик</th>
+                <th>Исполнитель</th>
+                <th>Срок</th>
+                <th>Просрочено</th>
+                <th>Теги</th>
+                <th>Действия</th>
+            </tr>
+        </thead>
+        <tbody id="tasksTableBody">
+            <!-- Будет заполнено через JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Модальное окно для создания/редактирования поручения -->
+<div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="taskModalLabel">Новое поручение</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="taskForm">
+                    <input type="hidden" id="taskId">
+                    <div class="mb-3">
+                        <label for="taskTitle" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="taskTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDescription" class="form-label">Описание</label>
+                        <textarea class="form-control" id="taskDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="taskCustomer" class="form-label">Заказчик</label>
+                            <select class="form-select" id="taskCustomer" required>
+                                <option value="">Выберите заказчика</option>
+                                {% for user in customers %}
+                                <option value="{{ user.id }}">{{ user.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="taskExecutor" class="form-label">Исполнитель</label>
+                            <select class="form-select" id="taskExecutor" required>
+                                <option value="">Выберите исполнителя</option>
+                                {% for user in executors %}
+                                <option value="{{ user.id }}">{{ user.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="taskPriority" class="form-label">Приоритет</label>
+                            <select class="form-select" id="taskPriority" required>
+                                <option value="low">Низкий</option>
+                                <option value="medium" selected>Средний</option>
+                                <option value="high">Высокий</option>
+                                <option value="critical">Критический</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="taskStatus" class="form-label">Статус</label>
+                            <select class="form-select" id="taskStatus">
+                                <option value="new" selected>Новая</option>
+                                <option value="in_progress">В работе</option>
+                                <option value="completed">Завершена</option>
+                                <option value="cancelled">Отменена</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskDueDate" class="form-label">Срок выполнения</label>
+                        <input type="datetime-local" class="form-control" id="taskDueDate">
+                    </div>
+                    <div class="mb-3">
+                        <label for="taskTags" class="form-label">Теги</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="taskTags" placeholder="Введите тег и нажмите Enter">
+                            <button class="btn btn-outline-secondary" type="button" id="addTagBtn">Добавить</button>
+                        </div>
+                        <div class="form-text">Доступные теги: <span id="availableTags"></span></div>
+                        <div id="tagsContainer" class="mt-2"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="saveTaskBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно для подтверждения удаления -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить это поручение?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Удалить</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Код JavaScript будет загружен из файла app.js
+</script>
+{% endblock %}
